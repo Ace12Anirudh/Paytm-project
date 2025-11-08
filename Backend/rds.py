@@ -1,25 +1,25 @@
 from flask import Flask, request, jsonify
 import pymysql
 from flask_cors import CORS
+import config
 
 app = Flask(__name__)
-CORS(app)  # Allow frontend to call backend
+CORS(app, resources={r"/*": {"origins": config.FRONTEND_ORIGIN}})  # Allow frontend to call backend
 
-# RDS MySQL config
-db_config = {
-    "host": "",  #add your rds  
-    "user": "admin",
-    "password": "Cloud1234",  #add your password 
-    "database": "paytm"  #add your db name 
-}
+CORS(app, resources={r"/upload": {"origins": config.FRONTEND_ORIGIN}})
+
+
 
 def get_db_connection():
-    return pymysql.connect(
-        host=db_config["host"],
-        user=db_config["user"],
-        password=db_config["password"],
-        database=db_config["database"]
+    conn = pymysql.connect(
+        host=config.DB_HOST,
+        user=config.DB_USER,
+        password=config.DB_PASS,
+        database=config.DB_NAME,
+        port=config.DB_PORT,
+        cursorclass=pymysql.cursors.DictCursor
     )
+    return conn
 
 # ---------- SIGNUP / SAVE ----------
 @app.route("/api/save", methods=["POST"])
@@ -46,6 +46,13 @@ def save_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# upload
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    file = request.files['file']
+    # upload to S3 here using boto3
+    # ...
+    return jsonify({"message": "Upload successful"}), 200
 
 # ---------- LOGIN / CHECK ----------
 @app.route("/api/login", methods=["POST"])

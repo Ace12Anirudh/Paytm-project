@@ -78,6 +78,7 @@
       cursor: pointer;
     }
   </style>
+  
 </head>
 <body>
   <div class="login-box">
@@ -121,10 +122,12 @@
         }
       });
     </script>
+    <script src="/config.js"></script>
     <script>
       // Set your backend API URL here
-      const API_URL = "http://backend-1090030115.ap-northeast-1.elb.amazonaws.com";
+      // const API_URL = "http://backend-1090030115.ap-northeast-1.elb.amazonaws.com";
     //const API_URL = "http://publicip-backend:5000";
+    const API_URL = window.APP_CONFIG && window.APP_CONFIG.API_URL ? window.APP_CONFIG.API_URL : "http://localhost:5000";
 
 
       document.getElementById('loginBtn').onclick = function() {

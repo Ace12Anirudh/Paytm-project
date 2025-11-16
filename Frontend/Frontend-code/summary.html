@@ -64,7 +64,7 @@
     <button onclick="downloadPDF()">Download Receipt as PDF</button>
     <span id="status"></span>
   </div>
-
+  <script src="/config.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
     const number = params.get('number') || 'N/A';
@@ -127,9 +127,25 @@
       formData.append("file", file);
             // change here frontend-public-ip:5000/upload
       // if ypu are using loadblancer for frontend s3 just paste that url
-      fetch("http://s3copy-446514415.ap-northeast-1.elb.amazonaws.com/upload", {
-        method: "POST",
-        body: formData
+      // Use config from config.js
+      //fetch("http://s3copy-446514415.ap-northeast-1.elb.amazonaws.com/upload", {
+        //method: "POST",
+        //body: formData
+       // })
+      const uploadUrl = window.APP_CONFIG?.S3_UPLOAD_URL || "http://localhost:5000/upload";
+
+        fetch(uploadUrl, {
+          method: "POST",
+          body: formData
+         })
+        .then(response => response.json())
+        .then(data => {
+          console.log("File uploaded successfully:", data);
+         })
+        .catch(error => {
+          console.error("Error uploading file:", error);
+        });
+
       })
       .then(res => res.json())
       .then(data => {
@@ -140,7 +156,7 @@
         const statusText = document.getElementById("status");
         if (statusText) statusText.innerText = "✅ Summary backup completed " ;
       });
-    });
+    
 
     function downloadPDF() {
       const latexContent = `
